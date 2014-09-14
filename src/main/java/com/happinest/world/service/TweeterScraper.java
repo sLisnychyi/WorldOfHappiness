@@ -27,7 +27,7 @@ public class TweeterScraper implements InternetService, Runnable {
         this.persister = new PersistTwitts();
         this.config = new TwitterConfig();
         this.location = null;
-        this.twitter = new TwitterFactory(config.getTwitterConfiguration(1)).getInstance();
+        this.twitter = new TwitterFactory(config.getTwitterConfiguration(0)).getInstance();
         this.date = date;
     }
 
@@ -35,7 +35,7 @@ public class TweeterScraper implements InternetService, Runnable {
         this.persister = new PersistTwitts();
         this.config = new TwitterConfig();
         this.location = location;
-        this.twitter = new TwitterFactory(config.getTwitterConfiguration(3)).getInstance();
+        this.twitter = new TwitterFactory(config.getTwitterConfiguration(0)).getInstance();
         this.date = date;
     }
 
@@ -78,7 +78,7 @@ public class TweeterScraper implements InternetService, Runnable {
                         System.out.println("Thread: " + Thread.currentThread().getName() + " TWITT_NO: " + tweetNumber + " id=" + status.getId() + " on " + createdAt +
                                 " DATA: \t" + tweetText + " GEO:" + query.getGeocode());
 
-                        twits.add(new TwitterData(alreadySeen, createdAt, location.getGeoPosition(), twitText, lang));
+                        twits.add(new TwitterData(status.getId(), alreadySeen, createdAt, location.getGeoPosition(), twitText, lang));
                         ++tweetNumber;
 
                         if (lastId < status.getId()) {
@@ -86,6 +86,7 @@ public class TweeterScraper implements InternetService, Runnable {
                         }
                         lastId = status.getId();
                     }
+                    Thread.sleep(6100);
                 }
                 stopRequest += tweetNumber;
                 //insert into the db

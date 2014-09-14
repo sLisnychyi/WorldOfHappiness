@@ -2,10 +2,7 @@ package com.happinest.world.persistance;
 
 import com.happinest.world.data.TwitterData;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -30,34 +27,47 @@ public class PersistTwitts {
     public void persistTweets(List<TwitterData> data) {
         if (data.size() > 0) {
             Connection connection = getConnection();
-            Statement statement = null;
+            PreparedStatement statement = null;
             try {
-                statement = connection.createStatement();
+                statement = connection.prepareStatement(
+                    "INSERT INTO data (date,language,geoposition,text,tid) VALUES (?, ?, ?, ?, ?)");
+
             } catch (SQLException e) {
                 System.out.println("Can't create statement.");
                 e.printStackTrace();
             }
-            if (statement != null) {
-                int numberOfInsertedRows = 0;
-                String state = data.get(0).getGeoPosition();
-                for (TwitterData twitt : data) {
-                    String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(twitt.getDate());
-                    String geoPosition = twitt.getGeoPosition();
-                    String language = twitt.getLanguage();
-                    String text = twitt.getText().replaceAll("'", "\"");
-                    String insert = "INSERT INTO data (date,language,geoposition,text) VALUES (" + "'" +
-                            date + "','" + language + "','" + geoPosition + "','" + text + "')";
-                    try {
-                        statement.executeUpdate(insert);
-                    } catch (Exception e) {
-                        System.out.println("Exception while working with db" + e.getMessage());
-                    }
-                    numberOfInsertedRows++;
-                }
-                System.out.println(String.format("INSERTED : %s rows. For = %s.", numberOfInsertedRows, state));
-
-            }
             try {
+                if (statement != null) {
+                    int numberOfInsertedRows = 0;
+                    String state = data.get(0).getGeoPosition();
+                    for (TwitterData twitt : data) {
+                        String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(twitt.getDate());
+                        String geoPosition = twitt.getGeoPosition();
+                        String language = twitt.getLanguage();
+                        String text = twitt.getText().replaceAll("'", "\"");
+
+                        statement.setDate(1, new java.sql.Date(twitt.getDate().getTime()));
+                        statement.setString(2, language);
+                        statement.setString(3, geoPosition);
+                        statement.setString(4, text);
+                        statement.setLong(5, twitt.getTid());
+
+
+                        //                    String insert = "INSERT INTO data (date,language,geoposition,text) VALUES (" + "'" +
+                        //                            date + "','" +
+                        //                            language + "','" +
+                        //                            geoPosition + "','" +
+                        //                            text + "')";
+                        try {
+                            statement.executeUpdate();
+                        } catch (Exception e) {
+                            System.out.println("Exception while working with db" + e.getMessage());
+                        }
+                        numberOfInsertedRows++;
+                    }
+                    System.out.println(String.format("INSERTED : %s rows. For = %s.", numberOfInsertedRows, state));
+
+                }
                 connection.close();
             } catch (SQLException e) {
                 System.out.println("Can't close connection.");

@@ -4,6 +4,7 @@ import java.util.Date;
 
 public class TwitterData {
 
+    private final long tid;
     private final boolean isChecked;
     private final Date date;
     private final String geoPosition;
@@ -11,10 +12,12 @@ public class TwitterData {
     private final String language;
 
 
-    public TwitterData(boolean checked, Date date, String geoPosition, String text, String language) {
-        isChecked = checked;
+    public TwitterData(long tid, boolean isChecked, Date date, String geoPosition, String text, String language) {
+        this.tid = tid;
+        this.isChecked = isChecked;
         this.date = date;
         this.geoPosition = geoPosition;
+
         this.text = text;
         this.language = language;
     }
@@ -38,6 +41,10 @@ public class TwitterData {
 
     public String getLanguage() {
         return language;
+    }
+
+    public long getTid() {
+        return tid;
     }
 
     @Override
