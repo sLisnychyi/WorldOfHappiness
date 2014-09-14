@@ -15,7 +15,7 @@ public class PersistTwitts {
     private Connection getConnection() {
         String user = "hack";
         String password = "verified_test@";
-        String url = "jdbc:mysql://" + "192.168.137.1" + ":" + "3306" + "/tweets";
+        String url = "jdbc:mysql://" + "192.168.4.1" + ":" + "3306" + "/tweets";
         Connection c = null;
         try {
             Class.forName("com.mysql.jdbc.Driver");

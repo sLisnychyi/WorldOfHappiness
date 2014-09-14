@@ -15,7 +15,7 @@ import static com.happinest.world.service.QuickTwitterApiTest.*;
 public class TweeterScraper implements InternetService, Runnable {
 
     private static final String DATE_FORMAT = "yyyy-MM-dd";
-    private static final int MAX_NUMBER_OF_TWEETS_PER_REQUEST = 500;
+    private static final int MAX_NUMBER_OF_TWEETS_PER_REQUEST = 1000;
     private static final int MAX_NUMBER_OF_TWEETS = 1000;
     private final PersistTwitts persister;
     private final TwitterConfig config;
@@ -31,16 +31,17 @@ public class TweeterScraper implements InternetService, Runnable {
         this.date = date;
     }
 
-    public TweeterScraper(Location location, Date date) {
+    public TweeterScraper(Location location, Date date, Twitter twitter) {
         this.persister = new PersistTwitts();
         this.config = new TwitterConfig();
         this.location = location;
-        this.twitter = new TwitterFactory(config.getTwitterConfiguration(3)).getInstance();
+        //this.twitter = new TwitterFactory(config.getTwitterConfiguration(3)).getInstance();
+        this.twitter = twitter;
         this.date = date;
     }
 
     @Override
-    public void scrapTwitterData(com.happinest.world.data.Location location, Date requestDate) throws TwitterException, InterruptedException {
+    public void scrapTwitterData(com.happinest.world.data.Location location, Date requestDate,  Twitter twitter) throws TwitterException, InterruptedException {
         long lastId = Long.MAX_VALUE;
         long stopRequest = 0;
 
@@ -86,6 +87,7 @@ public class TweeterScraper implements InternetService, Runnable {
                         }
                         lastId = status.getId();
                     }
+                    Thread.sleep(6000);
                 }
                 stopRequest += tweetNumber;
                 //insert into the db
@@ -130,7 +132,7 @@ public class TweeterScraper implements InternetService, Runnable {
     @Override
     public void run() {
         try {
-            scrapTwitterData(this.location, this.date);
+            scrapTwitterData(this.location, this.date, this.twitter);
         } catch (TwitterException | InterruptedException e) {
             e.printStackTrace();
         }

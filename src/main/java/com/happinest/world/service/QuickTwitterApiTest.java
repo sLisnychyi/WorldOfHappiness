@@ -15,7 +15,9 @@ public class QuickTwitterApiTest {
     //public static volatile AtomicInteger NUMBER_OF_CONFIG_TOKEN = new AtomicInteger(2);
 
     public static void main(String[] args) throws TwitterException {
-        ExecutorService executor = Executors.newFixedThreadPool(2);
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+        //ExecutorService executor = Executors.newSingleThreadExecutor();
+        TwitterConfig config = new TwitterConfig();
         //InternetService scraper = new TweeterScraper();
         try {
             //double[] wisconsin = {-92.8893, 42.4919, -86.8052, 47.0808};
@@ -27,11 +29,16 @@ public class QuickTwitterApiTest {
 //                scraper.scrapTwitterData(location);
 //            }
             // concurrency decision
-            Date requestStartDate = new Date(2014, 9, 12);
-            while (true) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(0);
+            cal.set(2014, Calendar.SEPTEMBER, 7);
+            Date requestStartDate = cal.getTime();
 
+            while (true) {
                 for (Location location : getLocations()) {
-                    executor.submit(new TweeterScraper(location, requestStartDate));
+                    for(int i = 0 ; i < config.getTwiterConfigs().size(); i++){
+                    executor.submit(new TweeterScraper(location, requestStartDate, new TwitterFactory(config.getTwitterConfiguration(i)).getInstance()));
+                    }
                 }
                 executor.shutdown();
                 while (!executor.isTerminated()) {
